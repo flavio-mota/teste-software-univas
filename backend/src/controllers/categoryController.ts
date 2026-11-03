@@ -45,7 +45,7 @@ export const getCategories = async (req: Request, res: Response) => {
 }
 
 // Get category by ID
-export const getCategoryById = async (req: Request, res: Response) => {
+export const getCategoryById = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params
 
@@ -61,10 +61,11 @@ export const getCategoryById = async (req: Request, res: Response) => {
     })
 
     if (!category) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'Category not found'
       })
+      return
     }
 
     res.json({
@@ -98,18 +99,20 @@ export const createCategory = async (req: Request, res: Response) => {
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Validation error',
-        details: error.errors
+        details: error.issues
       })
+      return
     }
 
     if (error instanceof Error && error.message.includes('Unique constraint')) {
-      return res.status(409).json({
+      res.status(409).json({
         success: false,
         error: 'Category name already exists'
       })
+      return
     }
 
     console.error('Error creating category:', error)
@@ -121,7 +124,7 @@ export const createCategory = async (req: Request, res: Response) => {
 }
 
 // Update category
-export const updateCategory = async (req: Request, res: Response) => {
+export const updateCategory = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params
     const validatedData = updateCategorySchema.parse(req.body)
@@ -140,18 +143,20 @@ export const updateCategory = async (req: Request, res: Response) => {
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Validation error',
-        details: error.errors
+        details: error.issues
       })
+      return
     }
 
     if (error instanceof Error && error.message.includes('Record to update not found')) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'Category not found'
       })
+      return
     }
 
     console.error('Error updating category:', error)
@@ -163,7 +168,7 @@ export const updateCategory = async (req: Request, res: Response) => {
 }
 
 // Delete category
-export const deleteCategory = async (req: Request, res: Response) => {
+export const deleteCategory = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params
 
@@ -173,10 +178,11 @@ export const deleteCategory = async (req: Request, res: Response) => {
     })
 
     if (!canDeleteCategory(tasksCount)) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Cannot delete category with existing tasks'
       })
+      return
     }
 
     await prisma.category.delete({
@@ -189,10 +195,11 @@ export const deleteCategory = async (req: Request, res: Response) => {
     })
   } catch (error) {
     if (error instanceof Error && error.message.includes('Record to delete does not exist')) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'Category not found'
       })
+      return
     }
 
     console.error('Error deleting category:', error)

@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:26-alpine
 
 # Install OpenSSL and other dependencies
 RUN apk add --no-cache openssl

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Routes, Route, Link, useLocation } from 'react-router-dom'
 import Users from './components/Users'
 import Tasks from './components/Tasks'

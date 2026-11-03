@@ -34,10 +34,6 @@ const Users: React.FC = () => {
     email: ''
   })
 
-  useEffect(() => {
-    fetchUsers()
-  }, [])
-
   const fetchUsers = async () => {
     try {
       setLoading(true)
@@ -51,6 +47,10 @@ const Users: React.FC = () => {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

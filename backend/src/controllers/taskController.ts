@@ -58,7 +58,7 @@ export const getTasks = async (req: Request, res: Response) => {
 }
 
 // Get task by ID
-export const getTaskById = async (req: Request, res: Response) => {
+export const getTaskById = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params
 
@@ -71,10 +71,11 @@ export const getTaskById = async (req: Request, res: Response) => {
     })
 
     if (!task) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'Task not found'
       })
+      return
     }
 
     res.json({
@@ -100,17 +101,19 @@ export const createTask = async (req: Request, res: Response) => {
     const category = await prisma.category.findUnique({ where: { id: validatedData.categoryId } })
 
     if (!user) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'User not found'
       })
+      return
     }
 
     if (!category) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'Category not found'
       })
+      return
     }
 
     const task = await prisma.task.create({
@@ -127,11 +130,12 @@ export const createTask = async (req: Request, res: Response) => {
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Validation error',
-        details: error.errors
+        details: error.issues
       })
+      return
     }
 
     console.error('Error creating task:', error)
@@ -143,7 +147,7 @@ export const createTask = async (req: Request, res: Response) => {
 }
 
 // Update task
-export const updateTask = async (req: Request, res: Response) => {
+export const updateTask = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params
     const validatedData = updateTaskSchema.parse(req.body)
@@ -152,20 +156,22 @@ export const updateTask = async (req: Request, res: Response) => {
     if (validatedData.userId) {
       const user = await prisma.user.findUnique({ where: { id: validatedData.userId } })
       if (!user) {
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           error: 'User not found'
         })
+        return
       }
     }
 
     if (validatedData.categoryId) {
       const category = await prisma.category.findUnique({ where: { id: validatedData.categoryId } })
       if (!category) {
-        return res.status(404).json({
+        res.status(404).json({
           success: false,
           error: 'Category not found'
         })
+        return
       }
     }
 
@@ -184,18 +190,20 @@ export const updateTask = async (req: Request, res: Response) => {
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Validation error',
-        details: error.errors
+        details: error.issues
       })
+      return
     }
 
     if (error instanceof Error && error.message.includes('Record to update not found')) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'Task not found'
       })
+      return
     }
 
     console.error('Error updating task:', error)
@@ -207,7 +215,7 @@ export const updateTask = async (req: Request, res: Response) => {
 }
 
 // Delete task
-export const deleteTask = async (req: Request, res: Response) => {
+export const deleteTask = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params
 
@@ -221,10 +229,11 @@ export const deleteTask = async (req: Request, res: Response) => {
     })
   } catch (error) {
     if (error instanceof Error && error.message.includes('Record to delete does not exist')) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'Task not found'
       })
+      return
     }
 
     console.error('Error deleting task:', error)

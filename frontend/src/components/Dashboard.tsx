@@ -24,10 +24,6 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchStats()
-  }, [])
-
   const fetchStats = async () => {
     try {
       setLoading(true)
@@ -42,12 +38,12 @@ const Dashboard: React.FC = () => {
       const categories = categoriesRes.data.data
 
       // Calculate stats
-      const tasksByStatus = tasks.reduce((acc: any, task: any) => {
+      const tasksByStatus = tasks.reduce((acc: Record<string, number>, task: { status: string }) => {
         acc[task.status] = (acc[task.status] || 0) + 1
         return acc
       }, {})
 
-      const tasksByPriority = tasks.reduce((acc: any, task: any) => {
+      const tasksByPriority = tasks.reduce((acc: Record<string, number>, task: { priority: string }) => {
         acc[task.priority] = (acc[task.priority] || 0) + 1
         return acc
       }, {})
@@ -78,6 +74,10 @@ const Dashboard: React.FC = () => {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchStats()
+  }, [])
 
   if (loading) {
     return <div className="loading">Carregando dashboard...</div>

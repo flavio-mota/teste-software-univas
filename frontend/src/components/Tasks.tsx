@@ -35,15 +35,11 @@ const Tasks: React.FC = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    status: 'PENDING' as const,
-    priority: 'MEDIUM' as const,
+    status: 'PENDING' as Task['status'],
+    priority: 'MEDIUM' as Task['priority'],
     userId: '',
     categoryId: ''
   })
-
-  useEffect(() => {
-    fetchData()
-  }, [])
 
   const fetchData = async () => {
     try {
@@ -65,6 +61,10 @@ const Tasks: React.FC = () => {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -167,7 +167,7 @@ const Tasks: React.FC = () => {
               <label>Status:</label>
               <select
                 value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value as Task['status'] })}
               >
                 <option value="PENDING">Pendente</option>
                 <option value="IN_PROGRESS">Em Progresso</option>
@@ -179,7 +179,7 @@ const Tasks: React.FC = () => {
               <label>Prioridade:</label>
               <select
                 value={formData.priority}
-                onChange={(e) => setFormData({ ...formData, priority: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, priority: e.target.value as Task['priority'] })}
               >
                 <option value="LOW">Baixa</option>
                 <option value="MEDIUM">Média</option>

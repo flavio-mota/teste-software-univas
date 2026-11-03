@@ -44,7 +44,7 @@ export const getUsers = async (req: Request, res: Response) => {
 }
 
 // Get user by ID
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserById = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params
 
@@ -60,10 +60,11 @@ export const getUserById = async (req: Request, res: Response) => {
     })
 
     if (!user) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'User not found'
       })
+      return
     }
 
     res.json({
@@ -97,18 +98,20 @@ export const createUser = async (req: Request, res: Response) => {
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Validation error',
-        details: error.errors
+        details: error.issues
       })
+      return
     }
 
     if (error instanceof Error && error.message.includes('Unique constraint')) {
-      return res.status(409).json({
+      res.status(409).json({
         success: false,
         error: 'Email already exists'
       })
+      return
     }
 
     console.error('Error creating user:', error)
@@ -120,7 +123,7 @@ export const createUser = async (req: Request, res: Response) => {
 }
 
 // Update user
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUser = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params
     const validatedData = updateUserSchema.parse(req.body)
@@ -139,18 +142,20 @@ export const updateUser = async (req: Request, res: Response) => {
     })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Validation error',
-        details: error.errors
+        details: error.issues
       })
+      return
     }
 
     if (error instanceof Error && error.message.includes('Record to update not found')) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'User not found'
       })
+      return
     }
 
     console.error('Error updating user:', error)
@@ -162,7 +167,7 @@ export const updateUser = async (req: Request, res: Response) => {
 }
 
 // Delete user
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser = async (req: Request<{ id: string }>, res: Response) => {
   try {
     const { id } = req.params
 
@@ -176,10 +181,11 @@ export const deleteUser = async (req: Request, res: Response) => {
     })
   } catch (error) {
     if (error instanceof Error && error.message.includes('Record to delete does not exist')) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'User not found'
       })
+      return
     }
 
     console.error('Error deleting user:', error)

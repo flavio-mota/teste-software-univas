@@ -31,10 +31,6 @@ const Categories: React.FC = () => {
     description: ''
   })
 
-  useEffect(() => {
-    fetchCategories()
-  }, [])
-
   const fetchCategories = async () => {
     try {
       setLoading(true)
@@ -48,6 +44,10 @@ const Categories: React.FC = () => {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchCategories()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

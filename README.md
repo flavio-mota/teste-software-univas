@@ -46,7 +46,7 @@ Este projeto foi estruturado para que os alunos pratiquem:
 ### Pré-requisitos
 
 - Docker e Docker Compose instalados
-- Node.js 20+ (opcional, para desenvolvimento local)
+- Node.js 26+ (opcional, para desenvolvimento local)
 
 ### 1. Clone e Configure
 
@@ -63,10 +63,10 @@ cp env.example .env
 
 ```bash
 # Inicie todos os serviços
-docker-compose up -d
+docker compose up -d
 
 # Verifique se os serviços estão rodando
-docker-compose ps
+docker compose ps
 ```
 
 ### 3. Acesse a Aplicação
@@ -80,15 +80,15 @@ docker-compose ps
 
 ```bash
 # Execute as migrações e seed
-docker-compose exec backend npm run db:push
-docker-compose exec backend npm run db:seed
+docker compose exec backend npm run db:push
+docker compose exec backend npm run db:seed
 ```
 
 ### 5. Para parar a aplicação
 
 ```bash
 # Encerra a aplicação e remove os containers
-docker-compose down
+docker compose down
 ```
 
 ## 🧪 Implementando os Testes
@@ -165,7 +165,7 @@ frontend/
    - Navegue pela interface e crie alguns usuários, categorias e tarefas
    - Teste todas as funcionalidades CRUD
    - Observe como os dados se relacionam entre si
-
+<!-- 
 2. **Implementar Testes Unitários Básicos**
    - Crie testes para validação de dados de entrada
    - Implemente testes para funções de transformação
@@ -208,12 +208,12 @@ frontend/
 9. **Melhorar Cobertura**
    - Aumente a cobertura de código
    - Implemente testes de mutação
-   - Adicione testes de acessibilidade
+   - Adicione testes de acessibilidade -->
 
 ## 🛠️ Tecnologias Utilizadas
 
 ### Backend
-- **Node.js 20**: Runtime JavaScript
+- **Node.js 26**: Runtime JavaScript
 - **TypeScript**: Linguagem tipada
 - **Express**: Framework web
 - **Prisma**: ORM para banco de dados
@@ -262,16 +262,16 @@ npm run dev
 
 ```bash
 # Ver logs de todos os serviços
-docker-compose logs -f
+docker compose logs -f
 
 # Ver logs de um serviço específico
-docker-compose logs -f backend
-docker-compose logs -f frontend
-docker-compose logs -f postgres
+docker compose logs -f backend
+docker compose logs -f frontend
+docker compose logs -f postgres
 
 # Acessar container para debugging
-docker-compose exec backend bash
-docker-compose exec frontend bash
+docker compose exec backend bash
+docker compose exec frontend bash
 ```
 
 <!-- ## 🤝 Contribuindo
