@@ -4,3 +4,7 @@ backend/node_modules
 backend/coverage
 frontend/node_modules
 frontend/coverage
+
+# Relatórios de teste de mutação (Stryker)
+backend/reports
+backend/.stryker-tmp

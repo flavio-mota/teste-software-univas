@@ -21,7 +21,9 @@ Este projeto foi estruturado para que os alunos pratiquem:
 │   │   ├── controllers/        # Controladores da API
 │   │   ├── routes/            # Rotas da API
 │   │   ├── middleware/        # Middleware de tratamento de erros
-│   │   └── index.ts           # Ponto de entrada da aplicação
+│   │   ├── lib/prisma.ts      # Instância única do Prisma Client
+│   │   ├── app.ts             # Aplicação Express (sem listen)
+│   │   └── index.ts           # Ponto de entrada (inicia o servidor)
 │   ├── prisma/
 │   │   ├── schema.prisma      # Schema do banco de dados
 │   │   └── seed.ts           # Dados iniciais para o banco
@@ -95,17 +97,42 @@ docker compose down
 
 ### Estrutura para Testes
 ```
+docs/
+└── especificacao.md    # Regras de negócio e requisitos: o oráculo dos testes
 backend/
 ├── tests/
-│   ├── unit/           # Testes unitários (para implementar)
-│   ├── integration/    # Testes de integração (para implementar)
-│   └── README.md       # Guia de exercícios
+│   ├── unit/           # Testes unitários (Vitest)
+│   └── integration/    # Testes de integração (Vitest + Supertest)
+├── vitest.config.ts
+└── stryker.config.json # Teste de mutação
 frontend/
 ├── tests/
-│   └── e2e/           # Testes E2E (para implementar)
-│       └── README.md   # Guia de exercícios
+│   ├── setup.ts        # Matchers do jest-dom
+│   └── unit/           # Testes de componentes (Vitest + Testing Library)
+└── vitest.config.ts
+AGENTS.md               # Regras para agentes de IA (Claude Code, Codex, Copilot)
 ```
 
+### Executando os testes unitários
+
+Os testes unitários não dependem do Docker nem do banco de dados e podem ser executados
+diretamente na máquina (Node.js 26+):
+
+```bash
+cd backend && npm install
+npm test                 # executa os testes
+npm run test:coverage    # cobertura de código
+npm run test:mutation    # teste de mutação (Stryker)
+
+cd ../frontend && npm install
+npm test
+```
+
+### Escrevendo testes com IA generativa
+
+O arquivo `AGENTS.md` é lido automaticamente por Claude Code, Codex e GitHub Copilot e
+define as regras que o agente deve seguir. Em especial: o agente **não altera o código de
+`src/`** e os valores esperados vêm de `docs/especificacao.md`, nunca da implementação.
 
 ## 📊 Entidades do Sistema
 
@@ -219,6 +246,8 @@ frontend/
 - **Prisma**: ORM para banco de dados
 - **PostgreSQL**: Banco de dados relacional
 - **Vitest**: Framework de testes
+- **Supertest**: Testes de integração da API
+- **Stryker**: Teste de mutação
 - **Zod**: Validação de dados
 
 ### Frontend
@@ -227,6 +256,7 @@ frontend/
 - **Vite**: Build tool e dev server
 - **React Router**: Roteamento
 - **Axios**: Cliente HTTP
+- **Vitest + Testing Library + jsdom**: Testes de componentes
 - **Selenium WebDriver**: Testes E2E
 
 ### DevOps
