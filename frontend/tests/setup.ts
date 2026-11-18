@@ -1,4 +1,5 @@
 import { beforeAll, afterEach, afterAll } from 'vitest'
+import { cleanup } from '@testing-library/react'
 // Adiciona ao expect() os matchers do jest-dom:
 // toBeInTheDocument(), toHaveTextContent(), toBeDisabled() etc.
 import '@testing-library/jest-dom/vitest'
@@ -9,4 +10,5 @@ import { server } from './msw/server'
 // uma rota para a qual o teste não declarou um handler.
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
 afterEach(() => server.resetHandlers())
+afterEach(cleanup)
 afterAll(() => server.close())
