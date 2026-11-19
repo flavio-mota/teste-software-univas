@@ -46,6 +46,42 @@ Dois nomes de categoria que resultem no mesmo nome normalizado são considerados
 Uma alteração de status só é aceita se respeitar a RN01. Caso contrário, a API deve
 responder `400` sem alterar a tarefa.
 
+## API — contrato HTTP (`backend/src/controllers`)
+
+Formato das respostas: sucesso `{ "success": true, "data": ... }` (listas incluem `count`);
+erro `{ "success": false, "error": "<mensagem>" }`.
+
+### API01 — `POST /api/users`
+
+- Dados válidos (`name` não vazio e `email` em formato válido): `201`, com o usuário criado em
+  `data` (`id`, `name`, `email`), e o usuário passa a existir no banco.
+- `name` vazio ou `email` inválido: `400`, e nenhum usuário é criado.
+- `email` já cadastrado: `409`, e nenhum usuário é criado.
+
+### API02 — `GET /api/users`
+
+- `200`, com `count` e `data` contendo todos os usuários, do mais recente para o mais
+  antigo; cada usuário traz a lista `tasks` (vazia quando não houver tarefas).
+
+### API03 — `DELETE /api/categories/:id` (aplica a RN02)
+
+- Categoria sem tarefas: `200`, e a categoria deixa de existir no banco.
+- Categoria com uma ou mais tarefas: `400`, e a categoria e suas tarefas permanecem no banco.
+- Categoria inexistente: `404`.
+
+### API04 — `POST /api/categories` (aplica a RN03)
+
+- Nome inédito: `201`.
+- Nome que, após a normalização da RN03, coincide com o de uma categoria existente
+  (ex.: `"Trabalho"` quando já existe `" trabalho "`): `409`, e nenhuma categoria é criada.
+
+### API05 — `PUT /api/tasks/:id` (aplica a RN01 e a RN04)
+
+- Alteração de status permitida pela RN01: `200`, e o novo status é gravado.
+- Alteração de status proibida pela RN01 (ex.: `COMPLETED` → `PENDING`): `400`, e a tarefa
+  permanece inalterada no banco.
+- Tarefa inexistente: `404`.
+
 ## Frontend — componente `Users` (`frontend/src/components/Users.tsx`)
 
 - **RF01** — Enquanto a lista é carregada, o texto "Carregando usuários..." é exibido.
@@ -61,3 +97,8 @@ responder `400` sem alterar a tarefa.
 - **RF07 (acessibilidade)** — Todo campo de formulário deve estar associado ao seu rótulo,
   de modo que possa ser localizado pelo texto do rótulo (tecnologias assistivas e
   `getByLabelText`).
+- **RF08** — Ao preencher Nome e Email e clicar em "Criar", os dados digitados são enviados
+  à API (`POST /api/users`); em caso de sucesso, o formulário é fechado e a lista, recarregada,
+  passa a exibir o novo usuário.
+- **RF09** — Se a API responder `409` ao criar um usuário, a mensagem "Email já cadastrado" é
+  exibida e o formulário permanece aberto com os dados digitados.
