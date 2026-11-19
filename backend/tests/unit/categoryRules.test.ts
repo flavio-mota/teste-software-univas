@@ -1,25 +1,22 @@
 import { describe, it, expect } from 'vitest'
 import { canDeleteCategory } from '../../src/utils/categoryRules'
 
-// Exemplo de referência (escrito à mão) para a aula de testes unitários.
-// Regra de negócio: uma categoria só pode ser excluída se não tiver tarefas.
+// RN02: categoria só pode ser excluída quando tasksCount === 0.
 describe('canDeleteCategory', () => {
-  it('permite excluir uma categoria sem tarefas', () => {
-    // Arrange
-    const quantidadeDeTarefas = 0
+  it.each([
+    { tasksCount: 0, esperado: true, tecnica: 'valor-limite' },
+    { tasksCount: 1, esperado: false, tecnica: 'valor-limite' },
+    { tasksCount: 10, esperado: false, tecnica: 'partição' },
+  ])(
+    'com $tasksCount tarefa(s) retorna $esperado ($tecnica)',
+    ({ tasksCount, esperado }) => {
+      // Arrange: tasksCount vindo da tabela
 
-    // Act
-    const resultado = canDeleteCategory(quantidadeDeTarefas)
+      // Act
+      const resultado = canDeleteCategory(tasksCount)
 
-    // Assert
-    expect(resultado).toBe(true)
-  })
-
-  it('impede excluir uma categoria com uma tarefa (valor-limite)', () => {
-    expect(canDeleteCategory(1)).toBe(false)
-  })
-
-  it('impede excluir uma categoria com várias tarefas', () => {
-    expect(canDeleteCategory(10)).toBe(false)
-  })
+      // Assert
+      expect(resultado).toBe(esperado)
+    },
+  )
 })
