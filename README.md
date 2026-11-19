@@ -102,30 +102,42 @@ docs/
 backend/
 ├── tests/
 │   ├── unit/           # Testes unitários (Vitest)
-│   └── integration/    # Testes de integração (Vitest + Supertest)
+│   └── integration/    # Testes de integração (Vitest + Supertest + PostgreSQL)
 ├── vitest.config.ts
 └── stryker.config.json # Teste de mutação
 frontend/
 ├── tests/
 │   ├── setup.ts        # Matchers do jest-dom
-│   └── unit/           # Testes de componentes (Vitest + Testing Library)
+│   ├── msw/            # Servidor de mocks HTTP (MSW)
+│   ├── unit/           # Testes de componentes (Vitest + Testing Library)
+│   └── integration/    # Componente + camada HTTP simulada (MSW)
 └── vitest.config.ts
 AGENTS.md               # Regras para agentes de IA (Claude Code, Codex, Copilot)
 ```
 
-### Executando os testes unitários
+### Executando os testes
 
 Os testes unitários não dependem do Docker nem do banco de dados e podem ser executados
 diretamente na máquina (Node.js 26+):
 
 ```bash
 cd backend && npm install
-npm test                 # executa os testes
+npm test                 # testes unitários
 npm run test:coverage    # cobertura de código
 npm run test:mutation    # teste de mutação (Stryker)
 
 cd ../frontend && npm install
-npm test
+npm test                 # testes unitários e de integração (MSW)
+```
+
+Os testes de integração do backend usam o PostgreSQL do Docker, em um banco separado
+(`teste_software_test_db`) recriado a cada execução:
+
+```bash
+docker compose up -d postgres
+cd backend
+npx prisma generate      # apenas na primeira vez
+npm run test:integration
 ```
 
 ### Escrevendo testes com IA generativa
@@ -257,6 +269,7 @@ define as regras que o agente deve seguir. Em especial: o agente **não altera o
 - **React Router**: Roteamento
 - **Axios**: Cliente HTTP
 - **Vitest + Testing Library + jsdom**: Testes de componentes
+- **MSW**: Simulação da API nos testes de integração
 - **Selenium WebDriver**: Testes E2E
 
 ### DevOps
