@@ -38,7 +38,7 @@ Este projeto foi estruturado para que os alunos pratiquem:
 │   │   ├── services/          # Serviços de API
 │   │   └── App.tsx           # Componente principal
 │   ├── tests/
-│   │   └── e2e/              # Testes E2E com Selenium
+│   │   └── e2e/              # Testes E2E com Playwright
 │   └── package.json
 └── README.md
 ```
@@ -110,7 +110,10 @@ frontend/
 │   ├── setup.ts        # Matchers do jest-dom
 │   ├── msw/            # Servidor de mocks HTTP (MSW)
 │   ├── unit/           # Testes de componentes (Vitest + Testing Library)
-│   └── integration/    # Componente + camada HTTP simulada (MSW)
+│   ├── integration/    # Componente + camada HTTP simulada (MSW)
+│   └── e2e/            # Jornadas completas no navegador (Playwright)
+│       └── support/    # Fixture de dados e verificação do ambiente
+├── playwright.config.ts
 └── vitest.config.ts
 AGENTS.md               # Regras para agentes de IA (Claude Code, Codex, Copilot)
 ```
@@ -138,6 +141,18 @@ docker compose up -d postgres
 cd backend
 npx prisma generate      # apenas na primeira vez
 npm run test:integration
+```
+
+Os testes E2E executam a aplicação completa no navegador. A aplicação roda no Docker e o
+Playwright, na máquina local:
+
+```bash
+docker compose up -d
+docker compose exec backend npm run db:seed   # dados iniciais (opcional)
+cd frontend
+npx playwright install chromium               # apenas na primeira vez
+npm run test:e2e
+npm run test:e2e:report                       # relatório HTML da última execução
 ```
 
 ### Escrevendo testes com IA generativa
@@ -270,7 +285,7 @@ define as regras que o agente deve seguir. Em especial: o agente **não altera o
 - **Axios**: Cliente HTTP
 - **Vitest + Testing Library + jsdom**: Testes de componentes
 - **MSW**: Simulação da API nos testes de integração
-- **Selenium WebDriver**: Testes E2E
+- **Playwright**: Testes E2E
 
 ### DevOps
 - **Docker**: Containerização

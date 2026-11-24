@@ -102,3 +102,35 @@ erro `{ "success": false, "error": "<mensagem>" }`.
   passa a exibir o novo usuário.
 - **RF09** — Se a API responder `409` ao criar um usuário, a mensagem "Email já cadastrado" é
   exibida e o formulário permanece aberto com os dados digitados.
+
+## Requisito não funcional
+
+- **RNF01 (acessibilidade)** — Em todas as telas (Usuários, Tarefas e Categorias), todo campo
+  de formulário deve estar associado ao seu rótulo, de modo que possa ser localizado pelo
+  texto do rótulo (tecnologias assistivas, `getByLabelText` e `getByLabel`).
+
+## Jornadas do usuário — testes E2E (`frontend/tests/e2e`)
+
+Cada jornada é executada no navegador, com frontend, backend e banco de dados em
+funcionamento. "Após recarregar" significa que o resultado deve continuar visível depois de
+recarregar a página, comprovando que foi gravado no banco.
+
+- **J01 — Navegação:** a partir do Dashboard, os links Usuários, Tarefas e Categorias levam
+  às telas correspondentes (URL `/users`, `/tasks`, `/categories` e título da tela visível).
+- **J02 — Cadastro de usuário:** ao preencher Nome e Email e clicar em "Criar", o formulário
+  é fechado e o usuário aparece na lista, inclusive após recarregar.
+- **J03 — Edição de usuário:** ao clicar em "Editar", alterar o nome e clicar em "Atualizar",
+  a lista exibe o novo nome, inclusive após recarregar; o nome anterior não aparece mais.
+- **J04 — Exclusão de usuário:** ao clicar em "Excluir" e confirmar, o usuário deixa de
+  aparecer na lista, inclusive após recarregar. Se a confirmação for cancelada, o usuário
+  permanece na lista.
+- **J05 — Cadastro, edição e exclusão de categoria:** as mesmas regras de J02, J03 e J04,
+  aplicadas à tela de Categorias (campos Nome e Descrição).
+- **J06 — Categoria em uso:** ao tentar excluir uma categoria que possui tarefas, uma
+  mensagem de erro é exibida e a categoria permanece na lista, inclusive após recarregar
+  (aplica a RN02 e a API03).
+- **J07 — Email já cadastrado:** ao tentar cadastrar um usuário com um email já existente, a
+  mensagem "Email já cadastrado" é exibida (aplica o RF09 e a API01).
+- **J08 — Tarefa concluída:** ao editar uma tarefa com status Concluída e tentar alterá-la
+  para Pendente, a alteração é recusada e, após recarregar, a lista continua exibindo o
+  status `COMPLETED` para a tarefa (aplica a RN01 e a API05).
