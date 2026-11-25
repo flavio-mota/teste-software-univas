@@ -21,8 +21,8 @@ describe('RF04 - Abertura do formulário de usuário', () => {
     expect(screen.getByRole('button', { name: 'Criar' }).textContent?.trim()).toBe('Criar')
   })
 
-  // D-F01: falhas confirmadas antes da marcação; não alterar src/ nesta atividade.
-  it.fails.each(['Nome:', 'Email:'])('exibe o campo identificado pelo rótulo %s ao abrir o formulário', async (rotulo) => {
+  // D-F01 corrigido no upstream: os rótulos agora estão associados aos campos.
+  it.each(['Nome:', 'Email:'])('exibe o campo identificado pelo rótulo %s ao abrir o formulário', async (rotulo) => {
     // Arrange
     vi.spyOn(api, 'get').mockResolvedValue({ data: { data: [] } })
     const user = userEvent.setup()
@@ -32,7 +32,7 @@ describe('RF04 - Abertura do formulário de usuário', () => {
     // Act
     await user.click(adicionar)
 
-    // Assert: RF04 exige campos identificáveis pelos rótulos (defeito D-F01).
+    // Assert: RF04 exige campos identificáveis pelos rótulos.
     expect(screen.getByLabelText<HTMLInputElement>(rotulo).value).toBe('')
   })
 })
