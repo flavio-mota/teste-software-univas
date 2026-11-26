@@ -294,20 +294,18 @@ futuros caso ambos editem o mesmo trecho do relatório.
 
 ---
 
-## Aula 13 - Testes E2E - 25/11/2026
+## Aula 13 - Testes E2E - revisão de 26/11/2026
 
 Aluno: Sergio Rodrigues Borges. Ferramenta: Codex.
-Referências: `Aula13 - Testes E2E.pdf`, slides 8-20, e jornadas/RNF01 de
-`docs/especificacao.md`. Entrega na branch `atividade-e2e`, baseada na atividade
-de integração e contendo todas as atualizações atuais de upstream/main.
+Referências: Aula13 - Testes E2E.pdf, slides 8-20, e docs/especificacao.md.
+Escopo solicitado pelo aluno: somente jornadas obrigatórias J03 a J06 e uma
+sabotagem de frontend. J01 e J02 permanecem como exemplos do professor.
 
 ### Plano e tabela de casos
 
-Os dez casos novos cobrem J03-J06 obrigatórias e J07-J08 complementares.
-J01 (3 destinos) e J02 (cadastro) reutilizam os arquivos de referência sem alteração.
-A tabela foi produzida com assistência de IA; não representa a etapa
-"especificar sem IA" realizada pelo aluno. A revisão independente dessa etapa
-permanece responsabilidade do aluno antes da entrega acadêmica.
+Oito casos novos, incluindo confirmar/cancelar exclusões. A tabela foi produzida
+com assistência de IA; a etapa acadêmica de especificar sem IA ainda depende
+da elaboração independente do aluno.
 
 | Caso | Jornada | Preparação pela API | Passos do usuário | Resultado visível esperado | Após recarregar |
 |---|---|---|---|---|---|
@@ -319,77 +317,57 @@ permanece responsabilidade do aluno antes da entrega acadêmica.
 | E06 | J05 exclusão | Categoria exclusiva sem tarefas | Excluir e confirmar | Categoria removida | Categoria ausente |
 | E07 | J05 alternativa | Categoria exclusiva sem tarefas | Excluir e cancelar | Categoria preservada | Categoria presente |
 | E08 | J06 | Usuário, categoria e tarefa exclusivos, relacionados | Excluir categoria e confirmar | Mensagem de erro; categoria mantida | Categoria presente; tarefa conferida também na tela Tarefas |
-| E09 | J07 complementar | Usuário com email exclusivo cadastrado | Tentar criar outro usuário com o mesmo email | Email já cadastrado; campos mantidos | Uma única linha com usuário original |
-| E10 | J08 complementar | Usuário, categoria e tarefa COMPLETED exclusivos | Editar tarefa; selecionar Pendente; Atualizar | Alteração recusada | Status COMPLETED mantido |
+
 
 ### Contextualização e geração
 
-Critérios usados para orientar a geração assistida (não é transcrição de prompt
-independente escrito pelo aluno):
+Critérios empregados na geração assistida:
 
 ```text
-Use a tabela E01-E10 e docs/especificacao.md como oráculo. Importe test/expect
-de ./support/fixtures e prepare dados com a fixture dados, unico e emailUnico.
-Crie os testes em arquivos novos *.atividade.e2e.spec.ts. Use getByRole,
-getByLabel, linhas filtradas pelos dados únicos e page.once('dialog') antes
-do clique. Cubra confirmar e cancelar exclusões. Confira persistência com
-page.reload(). Registre categorias criadas na UI para limpeza mesmo se uma
-asserção falhar. Não use mocks, seletores CSS/XPath, esperas fixas, force,
-retries extras ou alterações na configuração. Execute antes de marcar
-test.fail(), registre defeitos e não mude as asserções para fazê-los passar.
-Repita cada caso cinco vezes; aplique sabotagens individualmente e restaure
-os arquivos de produção antes de continuar.
+Implemente E01-E08 conforme J03-J06 e RNF01 de docs/especificacao.md.
+Use test/expect de ./support/fixtures, dados, unico e emailUnico.
+Prepare os dados pela API, realize as ações pela UI e confira persistência
+com page.reload(). Use getByRole/getByLabel e page.once('dialog').
+Registre para limpeza os dados criados pela interface, inclusive em finally.
+Não use mocks, CSS/XPath, force, esperas fixas ou aumento de timeout/retries.
+Não altere as asserções para passar: documente falhas comprovadas com test.fail().
+Execute cinco repetições e uma sabotagem temporária de frontend:
+remover fetchUsers() após salvar, executar J02/J03 e restaurar o arquivo.
 ```
 
-Os agentes opcionais do Playwright não foram instalados; foi utilizado o fluxo
-por prompt permitido pela apresentação. A inspeção do resultado incluiu o
-relatório, contextos de erro e captura do formulário de categorias.
+### Revisão e ambiente
 
-### Ambiente e revisão
+- Aplicação completa no Docker; Chromium local; API e PostgreSQL reais.
+- Dados exclusivos por teste; nenhum dado do seed é usado como pré-condição.
+- Mantidos configuração, fixtures, timeouts, retries e exemplos do professor.
+- Diálogos registrados antes do clique; alternativas de cancelamento incluídas.
+- Localizadores por papel/rótulo e linhas filtradas por valores únicos.
+- Persistência conferida após recarregar; nenhuma espera fixa nos testes.
+- Cadastro de categoria aguarda o POST e registra o dado para limpeza em finally.
+- Apenas test.fail() para defeito comprovado; nenhuma marcação skip/only.
 
-- Aplicação completa em Docker: frontend :3000, backend :3001 e PostgreSQL.
-- Playwright local com Chromium da versão instalada no lockfile.
-- Banco da aplicação existente, sem reset e sem reexecutar seed; dados do seed
-  não são pré-condições dos testes e não são alterados.
-- Mantidos workers 1, retries 0, timeout original, configuração, fixtures e
-  especificação do professor. Sem alteração permanente em src/.
-- Localizadores sem CSS/XPath; controles por papel/rótulo; linhas por dado único.
-- Dialog handler registrado antes da exclusão; verificação de que houve diálogo
-  impede que o cenário de cancelamento passe se a confirmação for removida.
-- E04 aguarda a resposta do POST antes de registrar o dado para limpeza;
-  um finally repete o registro por nome se a jornada falhar depois da gravação.
-- Não se verifica quantidade global de registros nem se depende de outro teste.
-- Esperas por asserções do Playwright; nenhuma espera fixa dentro dos testes.
-- `test.fail()` adicionado somente após a primeira execução comprovar o defeito.
-  Uma falha esperada não valida as etapas posteriores que não foram alcançadas.
+### Defeito confirmado e limite de cobertura
 
-### Defeitos e limites de cobertura
-
-| ID | Casos | Especificado | Observado | Registro |
+| ID | Casos | Esperado | Observado | Tratamento |
 |---|---|---|---|---|
-| E2E-D01 | E04/E05, J05/RNF01 | Campos associados a Nome e Descrição | Rótulos visíveis sem associação; getByLabel('Nome:') não encontra o campo | test.fail; cadastro/edição bloqueados antes de salvar |
-| E2E-D02 | E10, J08/RNF01 | Status localizável pelo rótulo | Select sem associação ao rótulo Status | test.fail; não foi possível alcançar a tentativa de transição pela UI |
-| E2E-D03 | E09, J07/RF09 | Email já cadastrado | Erro ao salvar usuário | test.fail; campos mantidos e registro original conferido após recarregar |
+| E2E-D01 | E04/E05, J05/RNF01 | Nome e Descrição associados aos campos | getByLabel('Nome:') não encontra o campo, embora o texto apareça | test.fail nos dois casos |
 
-E2E-D01/E2E-D02 não foram contornados com seletores estruturais. Os scripts
-contêm a jornada completa, mas a persistência de cadastro/edição de categorias
-e a recusa de transição de J08 não foram validadas até o fim nesta versão.
-A ausência de validação de transições já observada na integração é evidência
-da atividade anterior, não um resultado obtido pelo E2E bloqueado.
+Cadastro e edição de categorias ficam bloqueados antes de salvar. Seus scripts
+contêm a jornada completa, mas a persistência desses dois fluxos não foi validada
+até o fim. Os rótulos não foram contornados com seletores estruturais.
+As falhas foram comprovadas na execução original antes da marcação test.fail().
 
-### Execução e estabilidade
+### Validação
 
-Execução inicial sem marcações: 14 casos, 10 aprovados e 4 reprovados.
-As quatro falhas correspondem a E04, E05, E09 e E10 e foram preservadas como
-falhas esperadas por `test.fail(true, descrição do defeito)`.
+Suíte atual: 12 casos (8 da atividade e 4 exemplos J01/J02).
+Validação em 26/11/2026, após restaurar a sabotagem: cinco repetições,
+60 execuções em aproximadamente 2 minutos, sem falhas inesperadas ou
+intermitentes. Foram 50 aprovações normais e 10 falhas esperadas (E04/E05,
+cinco vezes cada). O resumo "60 passed" do Playwright inclui falhas esperadas.
+Falhas esperadas não representam correção do defeito nem validação de passos
+que não foram alcançados.
 
-Estabilidade com `--repeat-each=5`: 70 execuções em aproximadamente 2,9 minutos,
-sem falhas inesperadas ou intermitentes. São 50 aprovações normais (10 casos x 5)
-e 20 falhas esperadas reproduzidas (4 casos x 5). O resumo do Playwright informa
-"70 passed" porque inclui resultados esperados; isso não significa que os
-quatro defeitos foram corrigidos ou que todas as jornadas chegaram ao fim.
-
-Comandos (pasta frontend):
+Comandos na pasta frontend:
 
 ```text
 npm run test:e2e
@@ -397,55 +375,29 @@ npx playwright test --repeat-each=5
 npm run test:e2e:report
 ```
 
-### Evidências locais
+### Uma sabotagem de frontend
 
-Na pasta de trabalho, fora do Git, `../e2e-evidencias/` preserva o relatório
-HTML inicial, os contextos de erro, capturas, vídeos e traces das falhas.
-`frontend/playwright-report/` contém o relatório mais recente e pode ser aberto
-com `npm run test:e2e:report`. Os artefatos grandes continuam ignorados pelo Git.
-Exemplo para analisar um trace: `npx playwright show-trace <caminho/trace.zip>`.
+Alteração temporária: retirar somente fetchUsers() após salvar em
+frontend/src/components/Users.tsx. Jornadas avaliadas: J02 (cadastro de referência)
+e J03 (edição). Esperado: os testes detectarem que a lista não é atualizada.
 
-### Avaliação por sabotagem
+O serviço frontend é reiniciado após aplicar/restaurar a mudança para evitar
+cache do Vite na montagem Windows/Docker. Não são alteradas asserções,
+configuração, timeout ou retries. O arquivo é restaurado byte a byte em finally.
 
-As alterações temporárias foram autorizadas pelo aluno e restauradas byte a
-byte em finally. A primeira tentativa revelou um problema de ambiente: o Vite
-no Docker não invalidou o cache ao editar arquivos pelo Windows. As três
-sabotagens de frontend não se refletiram no navegador e essa tentativa foi
-descartada como avaliação dos testes. Foi necessário reiniciar o serviço após
-cada aplicação/restauração; não foram mudados localizadores, expectativas,
-timeouts, retries ou configuração para obter as falhas.
+Resultado da sabotagem executada em 26/11/2026: detectada, com duas falhas
+novas (J02 e J03), em 19,6 segundos. O cadastro não aparece na lista e a edição
+não mostra o novo nome. Após restaurar Users.tsx, a comparação dos snapshots
+da API confirmou que os dados preexistentes foram preservados integralmente.
 
-Cada sabotagem é avaliada apenas nas jornadas afetadas; a suíte completa é
-executada novamente depois de restaurar o código. O comando mantém os
-reporters list/json/html e gera capturas, vídeos e traces das falhas reais.
+### Evidências e entrega
 
-| Sabotagem aplicada isoladamente | Jornadas executadas | Falhas novas observadas | Resultado |
-|---|---|---|---|
-| Retirar fetchUsers após salvar em Users.tsx | J02 e J03 | Cadastro não atualiza lista; edição não mostra novo nome | Detectada, 2 falhas |
-| Trocar o texto do link Categorias por Classificações em App.tsx | J01, três destinos | Link Categorias não localizado; Usuários/Tarefas continuam passando | Detectada, 1 falha |
-| Ignorar window.confirm ao excluir usuário | J04, cancelamento | Nenhum diálogo; usuário é excluído apesar da intenção de cancelar | Detectada, 1 falha |
-| Desabilitar canDeleteCategory no backend | J06 | Erro não exibido, categoria e tarefa removidas | Detectada, 1 falha |
+Evidências desta revisão em ../e2e-evidencias-ajuste/, fora do Git: relatório
+HTML/JSON, capturas, vídeos e traces da sabotagem e snapshots dos dados.
+O relatório de execução normal fica em frontend/playwright-report/.
+As evidências anteriores continuam arquivadas como histórico, mas não compõem
+os resultados desta revisão de escopo.
 
-As três sabotagens de frontend exigidas na atividade foram detectadas. Também
-foi avaliada a sabotagem de backend apresentada no slide 18: total 4/4 detectadas,
-sem usar Stryker. Isso não significa cobertura de todas as falhas possíveis.
-
-Depois da restauração, a comparação completa das respostas da API confirmou
-preservação dos registros preexistentes: 2 usuários, 3 categorias e 5 tarefas.
-Não restaram usuários de teste com domínio @teste.com. O seed não foi alterado
-nem reexecutado. Os snapshots e os resumos JSON estão em `../e2e-evidencias/`.
-
-### Entrega e compatibilidade
-
-Três arquivos novos em `frontend/tests/e2e/` e esta seção do relatório.
-Nenhuma alteração nos exemplos J01/J02, fixtures, configuração, src/,
-AGENTS.md, especificação ou manifestos de dependências. A branch mantém os
-commits anteriores do aluno e a base atual do professor; a main não é sobrescrita.
-As falhas esperadas precisam ser revisitadas quando os defeitos forem corrigidos:
-um teste que passar inesperadamente fará a suíte reprovar, indicando revisão
-da marcação test.fail().
-
-Verificação final após restaurar as sabotagens: 14 resultados esperados em
-34,2 segundos (10 aprovações normais e 4 falhas conhecidas), zero falhas
-inesperadas. O diff confirmou que nenhum arquivo de produção ou configuração
-foi alterado na entrega.
+Entrega: Users.atividade.e2e.spec.ts, Categories.atividade.e2e.spec.ts e esta seção.
+Nenhuma mudança permanente em src/, especificação, configuração ou dependências.
+As seções das atividades anteriores permanecem preservadas.
